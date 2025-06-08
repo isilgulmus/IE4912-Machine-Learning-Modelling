@@ -1,0 +1,14 @@
+# Ignore environment file
+.env
+
+# Ignore all data files in the datas directory
+datas/
+
+# Ignore common temporary files and OS clutter
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+.DS_Store
+Thumbs.db
