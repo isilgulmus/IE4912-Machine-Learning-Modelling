@@ -19,35 +19,75 @@ Additional features were engineered to improve model performance:
 
 All categorical variables were one-hot encoded. Multicollinearity was checked using the Variance Inflation Factor (VIF), ensuring all features were suitable for linear modeling.
 
+#### 🔍 Final Feature Set
+
+| Feature Name                    | Type     | Category            | Description                                  |
+|--------------------------------|----------|---------------------|----------------------------------------------|
+| weather_temp                   | float64  | Numerical (Cont.)   | Temperature at the time of the trip         |
+| HOUR                           | int32    | Numerical (Discrete)| Hour of the day (0–23)                      |
+| DAY_OF_WEEK_1 to 6             | bool     | One-Hot Encoded     | Day of the week (Monday–Saturday)           |
+| HOLIDAY_CATEGORY_Holiday       | bool     | One-Hot Encoded     | Public holiday indicator                    |
+| MONTH_2 to MONTH_12            | bool     | One-Hot Encoded     | Month (February–December)                   |
+| PANDEMIC_CONDITION_Pandemic    | bool     | One-Hot Encoded     | COVID period indicator                      |
+| SCHOOL_STATUS_Closed           | bool     | One-Hot Encoded     | School closed status                        |
+| weather_description_Cloudy     | bool     | One-Hot Encoded     | Cloudy weather condition                    |
+| weather_description_Low Vis.   | bool     | One-Hot Encoded     | Fog, mist, haze, etc.                       |
+| weather_description_Storm      | bool     | One-Hot Encoded     | Storms, thunder, or tornadoes               |
+| weather_description_Precip.    | bool     | One-Hot Encoded     | Rain or snow                                |
+| HATSURESI_LAG_1 to LAG_5       | float64  | Lag Feature (Num.)  | Durations of previous 1–5 trips at a stop   |
+
+
 ### 🧠 Modeling Approach
 
 * **Baseline model**: Linear regression showed poor performance without lag features (R² = 0.11).
 * Adding lag variables improved the R² to **0.63**, with RMSE = **7.23** and MAPE = **8.07%**, highlighting the importance of short-term historical context.
 
+#### 📉 Effect of Lag Features:
+
+| Model              | R² Score | RMSE  | MAE  | MAPE (%) |
+|-------------------|----------|-------|------|----------|
+| Without LAG       | 0.1100   | 11.19 | 8.71 | 14.84    |
+| With 5 LAG values | 0.6300   | 7.23  | 4.83 | 8.07     |
+
+Lag features significantly boosted model performance, confirming the relevance of short-term memory in trip delays.
+
 ### 🌲 Ensemble Learning and Stacking
 
-We tested several advanced models:
+We tested several advanced models.
 
-* **Random Forest**: R² = 0.687
-* **XGBoost**: R² = 0.6967
-* **LightGBM**: R² = 0.6954
-* **CatBoost** (best): R² = 0.7015, RMSE = 6.45, MAPE = 6.94%
+#### 📊 Model Comparison Table:
 
-A stacked model combining XGBoost and CatBoost with a Ridge Regression meta-learner achieved similar performance (R² = 0.6977), offering better stability and generalization.
+| Model                        | R² Score | RMSE | MAE  | MAPE (%) |
+|-----------------------------|----------|------|------|----------|
+| Linear Regression           | 0.6300   | 7.23 | 4.83 | 8.07     |
+| XGBoost                     | 0.6906   | 6.55 | 4.31 | 7.14     |
+| XGBoost – Grid Search       | 0.6967   | 6.49 | 4.26 | 7.06     |
+| LightGBM                    | 0.6881   | 6.58 | 4.38 | 7.27     |
+| LightGBM – Randomized Search| 0.6954   | 6.50 | 4.29 | 7.11     |
+| CatBoost                    | 0.6971   | 6.48 | 4.24 | 7.02     |
+| CatBoost – Randomized Search| **0.7015** | **6.45** | **4.19** | **6.94** |
+| Stacking (XGB + CAT + LR)   | 0.6977   | 6.48 | 4.24 | 7.02     |
+| Stacking – Grid Search      | 0.6961   | 6.49 | 4.26 | 7.06     |
+| Stacking + Ridge            | 0.6977   | 6.48 | 4.24 | 7.01     |
+| Stacking + Lasso            | 0.6977   | 6.48 | 4.24 | 7.02     |
+| Random Forest               | 0.6871   | 6.59 | 4.25 | 7.06     |
+
+
 
 ### 🔍 Model Explainability with SHAP
 
 * SHAP analysis confirmed the high importance of lag features (`HATSURESI_LAG_1`, `LAG_2`, etc.), followed by hour of day, temperature, and pandemic flags.
 * Broader calendar features (month, weekday) had lower impact compared to real-time and recent-history features.
 
-### ✅ Cross-Validation and Deployment Simulation
+![SHAP summary and waterfall](./SHAP.png)
+
+### ✅ Cross-Validation
 
 * **5-Fold Cross-Validation** confirmed model robustness with an average R² = **0.7011**.
 * A **full-day simulation** using the trained CatBoost model reproduced realistic traffic patterns, capturing morning/evening rush peaks and off-peak stability.
 * Lag variables were dynamically updated during simulation to reflect real-time delay propagation.
-Tabii! Aşağıda, paylaştığınız dosya yapısına ve içerdiği dosya isimlerine uygun, profesyonel ve açıklayıcı bir `README.md` formatı sunuyorum. Bu açıklama, projeyi baştan sona anlamak isteyen veri bilimi ekipleri veya GitHub ziyaretçileri için uygun düzeydedir.
 
----
+![Predicted Trip Durations](./predictions.png)
 
 # 🚌 Trip Duration Prediction using Ensemble Learning
 
@@ -105,10 +145,17 @@ This repository contains a complete end-to-end pipeline for predicting urban bus
 ## 📈 Best Model Performance (CatBoost)
 
 | Metric | Value        |
-| ------ | ------------ |
-| R²     | 0.7015       |
+|--------|--------------|
+| R²     | **0.7015**   |
 | RMSE   | 6.45 minutes |
+| MAE    | 4.19 minutes |
 | MAPE   | 6.94%        |
+
+**Tuned Parameters (via Randomized Search):**
+
+| Depth | Iterations | Learning Rate | L2 Regularization |
+|-------|------------|----------------|--------------------|
+| 10    | 500        | 0.10           | 9                  |
 
 ---
 
