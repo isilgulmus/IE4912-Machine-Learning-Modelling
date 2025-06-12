@@ -87,7 +87,7 @@ We tested several advanced models.
 * A **full-day simulation** using the trained CatBoost model reproduced realistic traffic patterns, capturing morning/evening rush peaks and off-peak stability.
 * Lag variables were dynamically updated during simulation to reflect real-time delay propagation.
 
-![Predicted Trip Durations](./predictions.png)
+![Predicted Trip Durations](./Predictions.png)
 
 # 🚌 Trip Duration Prediction using Ensemble Learning
 
