@@ -51,6 +51,12 @@ All categorical variables were one-hot encoded. Multicollinearity was checked us
 
 Lag features significantly boosted model performance, confirming the relevance of short-term memory in trip delays.
 
+#### 📐 Linear Regression Model Formula
+
+Below is the predicted value breakdown from the trained Linear Regression model. It shows the additive contributions of each feature (especially lag variables and hour of day) to the final trip duration prediction.
+
+![Linear Regression Feature Contributions](./linearRegression.png)
+
 ### 🌲 Ensemble Learning and Stacking
 
 We tested several advanced models.
